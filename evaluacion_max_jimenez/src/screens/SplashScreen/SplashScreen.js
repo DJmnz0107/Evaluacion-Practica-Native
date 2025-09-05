@@ -1,41 +1,34 @@
-// src/screens/SplashScreen/SplashScreen.js
+// components/SplashScreen/SplashScreen.js
 import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ActivityIndicator,
-  Image
+  ActivityIndicator
 } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-
-// Prevenir que se oculte automáticamente
-SplashScreen.preventAutoHideAsync();
 
 const CustomSplashScreen = ({ onFinish }) => {
   useEffect(() => {
-    const prepare = async () => {
-      try {
-        // Simular carga de recursos (puedes agregar lógica real aquí)
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        // Ocultar splash screen nativo y llamar callback
-        await SplashScreen.hideAsync();
+    console.log('🎬 SplashScreen iniciado');
+    
+    const timer = setTimeout(() => {
+      console.log('🎬 SplashScreen terminando...');
+      if (onFinish) {
         onFinish();
       }
-    };
+    }, 4000); // 4 segundos de splash
 
-    prepare();
+    return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {/* Logo o icono de la app */}
+        {/* Logo profesional */}
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>📱</Text>
+          <View style={styles.logo}>
+            <Text style={styles.logoText}>EDU</Text>
+          </View>
           <Text style={styles.appName}>Universidad App</Text>
         </View>
         
@@ -71,9 +64,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 50,
   },
+  logo: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
   logoText: {
-    fontSize: 60,
-    marginBottom: 10,
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   appName: {
     fontSize: 28,

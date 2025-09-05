@@ -10,13 +10,26 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let timeoutId;
+    
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Auth state changed:', user ? 'Usuario logueado' : 'Usuario no logueado');
       setUser(user);
-      setLoading(false);
+      
+      // Delay mínimo de 2 segundos para asegurar que se vea el splash
+      timeoutId = setTimeout(() => {
+        console.log('Auth loading terminado');
+        setLoading(false);
+      }, 2000);
     });
 
     // Cleanup function
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   const value = {

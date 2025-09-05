@@ -1,4 +1,4 @@
-// src/screens/AuthScreens/LoginScreen.js
+// components/screens/AuthScreens/LoginScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -57,7 +57,6 @@ const LoginScreen = ({ navigation }) => {
     setLoading(false);
     
     if (result.success) {
-      // La navegación será manejada por el AuthContext/Navigator
       console.log('Login exitoso');
     } else {
       Alert.alert('Error de Inicio de Sesión', result.error || 'Credenciales incorrectas');
@@ -71,9 +70,13 @@ const LoginScreen = ({ navigation }) => {
     >
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.welcomeText}>👋</Text>
-          <Text style={styles.title}>Bienvenido</Text>
-          <Text style={styles.subtitle}>Inicia sesión en tu cuenta</Text>
+          <View style={styles.logoContainer}>
+            <View style={styles.logo}>
+              <Text style={styles.logoText}>EDU</Text>
+            </View>
+            <Text style={styles.title}>Bienvenido</Text>
+            <Text style={styles.subtitle}>Inicia sesión en tu cuenta</Text>
+          </View>
         </View>
 
         <View style={styles.form}>
@@ -105,7 +108,7 @@ const LoginScreen = ({ navigation }) => {
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Text style={styles.eyeText}>{showPassword ? '🙈' : '👁️'}</Text>
+                <Text style={styles.eyeText}>{showPassword ? 'OCULTAR' : 'VER'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -150,9 +153,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  welcomeText: {
-    fontSize: 50,
+  logoContainer: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  logoText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   title: {
     fontSize: 32,
@@ -189,16 +211,20 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   passwordInput: {
-    paddingRight: 50,
+    paddingRight: 70,
   },
   eyeButton: {
     position: 'absolute',
     right: 15,
     top: 15,
     padding: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   eyeText: {
-    fontSize: 18,
+    fontSize: 12,
+    color: '#007AFF',
+    fontWeight: '600',
   },
   button: {
     backgroundColor: '#007AFF',
