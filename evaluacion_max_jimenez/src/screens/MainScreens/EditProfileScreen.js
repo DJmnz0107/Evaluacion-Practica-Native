@@ -1,4 +1,4 @@
-// src/screens/MainScreens/EditProfileScreen.js
+// components/screens/MainScreens/EditProfileScreen.js
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform
 } from 'react-native';
-import { updateUserData } from '../../config/authService';
+import { updateUserData, getUserData } from '../../config/authService';
 import { auth } from '../../config/firebase';
 
 const EditProfileScreen = ({ navigation, route }) => {
@@ -25,16 +25,59 @@ const EditProfileScreen = ({ navigation, route }) => {
     anoGraduacion: ''
   });
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
+    console.log('Iniciando carga de datos...');
+    
     if (userData) {
+      // Si vienen datos como parámetros (navegación desde Home)
+      console.log('Usando datos de parámetros');
       setFormData({
         nombre: userData.nombre || '',
         tituloUniversitario: userData.tituloUniversitario || '',
         anoGraduacion: userData.anoGraduacion?.toString() || ''
       });
+      setInitialLoading(false);
+    } else if (currentUser) {
+      // Si no hay datos, cargarlos directamente (desde tabs)
+      console.log('Cargando datos desde Firebase...');
+      setInitialLoading(true);
+      
+      try {
+        const result = await getUserData(currentUser.uid);
+        console.log('Resultado:', result);
+        
+        if (result.success && result.data) {
+          console.log('Datos encontrados:', result.data);
+          setFormData({
+            nombre: result.data.nombre || '',
+            tituloUniversitario: result.data.tituloUniversitario || '',
+            anoGraduacion: result.data.anoGraduacion?.toString() || ''
+          });
+        } else {
+          console.log('No hay datos guardados');
+          Alert.alert(
+            'Sin información previa',
+            'No se encontró información previa. Puedes agregar tus datos aquí.',
+            [{ text: 'OK' }]
+          );
+        }
+      } catch (error) {
+        console.log('Error:', error);
+        Alert.alert('Error', 'Error al cargar los datos');
+      }
+      
+      setInitialLoading(false);
+    } else {
+      console.log('No hay usuario autenticado');
+      setInitialLoading(false);
     }
-  }, [userData]);
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -86,8 +129,10 @@ const EditProfileScreen = ({ navigation, route }) => {
       Alert.alert(
         'Información Actualizada',
         'Tus datos han sido actualizados correctamente',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
+        [{ text: 'OK' }]
       );
+      // Recargar datos después de guardar
+      loadUserData();
     } else {
       Alert.alert('Error', result.error || 'Error al actualizar la información');
     }
@@ -99,10 +144,19 @@ const EditProfileScreen = ({ navigation, route }) => {
       '¿Estás seguro que quieres descartar los cambios?',
       [
         { text: 'Continuar Editando', style: 'cancel' },
-        { text: 'Descartar', style: 'destructive', onPress: () => navigation.goBack() }
+        { text: 'Descartar', style: 'destructive', onPress: () => loadUserData() }
       ]
     );
   };
+
+  if (initialLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Cargando información...</Text>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView 
@@ -111,8 +165,13 @@ const EditProfileScreen = ({ navigation, route }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.header}>
-          <Text style={styles.title}>Editar Información</Text>
-          <Text style={styles.subtitle}>Actualiza tus datos personales</Text>
+          <View style={styles.logoContainer}>
+            <View style={styles.logo}>
+              <Text style={styles.logoText}>EDU</Text>
+            </View>
+            <Text style={styles.title}>Editar Información</Text>
+            <Text style={styles.subtitle}>Actualiza tus datos personales</Text>
+          </View>
         </View>
 
         <View style={styles.form}>
@@ -172,7 +231,7 @@ const EditProfileScreen = ({ navigation, route }) => {
               {loading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
-                <Text style={styles.saveButtonText}>💾 Guardar Cambios</Text>
+                <Text style={styles.saveButtonText}>Guardar Cambios</Text>
               )}
             </TouchableOpacity>
 
@@ -181,7 +240,7 @@ const EditProfileScreen = ({ navigation, route }) => {
               onPress={handleCancel}
               disabled={loading}
             >
-              <Text style={styles.cancelButtonText}>❌ Cancelar</Text>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -195,6 +254,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
@@ -203,6 +273,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 40,
     marginBottom: 30,
+  },
+  logoContainer: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  logoText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
   title: {
     fontSize: 28,
@@ -254,11 +347,6 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
   saveButton: {
     backgroundColor: '#007AFF',

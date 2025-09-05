@@ -105,13 +105,6 @@ const HomeScreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity 
-          style={styles.editButton} 
-          onPress={handleEditProfile}
-        >
-          <Text style={styles.editButtonText}>Editar Información</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
           style={styles.logoutButton} 
           onPress={handleLogout}
         >
