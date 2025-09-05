@@ -7,7 +7,7 @@
 
 
 ## 📹 Enlace del video demostrativo
-[🔗Enlace del video demostrativo]([https://](https://drive.google.com/file/d/1wBowUcuoaEAmb-giX7ounhVmuVbLBmyc/view?usp=sharing))
+[🔗Enlace del video demostrativo](https://](https://drive.google.com/file/d/1wBowUcuoaEAmb-giX7ounhVmuVbLBmyc/view?usp=sharing))
 
 ---
 
